@@ -1,37 +1,38 @@
-import { Entity, StaticEntity} from "../entities";
+import { Entity, EntityWithHelper, StaticEntityWithHelper } from "../entities";
 
-type anyEntity = Array<(Entity | StaticEntity)>;
+type AnyEntityWithHelper = EntityWithHelper | StaticEntityWithHelper;
+type AnyEntity = Array<(AnyEntityWithHelper)>;
 
 export interface Collision {
-    entities: anyEntity;
-    splittedEntities: anyEntity;
+    entities: AnyEntity;
+
     isOnSurface: (target: Entity) => boolean;
     canMoveRight: (target: Entity) => boolean;
     canMoveLeft: (target: Entity) => boolean;
 }
 
 export default class CollisionClass implements Collision {
-    public entities: anyEntity;
-    public splittedEntities: anyEntity;
+    public entities: AnyEntity;
+    private _splittedEntities: AnyEntity;
 
-    constructor(entities: anyEntity) {
+    constructor(entities: AnyEntity) {
         this.entities = entities;
     }
 
     // TODO save last splittedEntities
     public updateSplitted({ min, max }: Screen) {
-        const splitted: anyEntity = [];
+        const splitted: AnyEntity = [];
         for (const item of this.entities) {
             if (item.leftSide() >= min && item.rightSide() <= max) {
                 splitted.push(item);
             }
         }
-        this.splittedEntities = splitted;
+        this._splittedEntities = splitted;
     }
 
     // true if on surface
-    public isOnSurface(target: Entity): boolean {
-        for (const item of this.splittedEntities) {
+    public isOnSurface(target: EntityWithHelper): boolean {
+        for (const item of this._splittedEntities) {
             if (target === item) {
                 continue;
             }
@@ -46,24 +47,62 @@ export default class CollisionClass implements Collision {
         return false;
     }
 
-    public canMoveRight(target: Entity): boolean {
-        for (const item of this.splittedEntities) {
+    public canMoveRight(target: EntityWithHelper): boolean {
+        for (const item of this._splittedEntities) {
             if (target === item) {
                 continue;
             }
             if (
-                target.rightSide() + target.speed >= item.leftSide() &&
-                target.topSide()
-
+                this._targetRightBetweenItem(target, item) &&
+                (
+                    this._targetTopBetweenItem(target, item) ||
+                    this._targetBottomBetweenItem(target, item)
+                )
             ) {
-                return true;
+                console.log("right", { target, item });
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
-    public canMoveLeft(target: Entity): boolean {
-        return true
+    public canMoveLeft(target: EntityWithHelper): boolean {
+        for (const item of this._splittedEntities) {
+            if (target === item) {
+                continue;
+            }
+            if (
+                this._targetLeftBetweenItem(target, item) &&
+                (
+                    this._targetTopBetweenItem(target, item) ||
+                    this._targetBottomBetweenItem(target, item)
+                )
+            ) {
+                console.log("left", { target, item });
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private _targetTopBetweenItem(target: EntityWithHelper, item: AnyEntityWithHelper): boolean {
+        return target.topSide() > item.topSide() &&
+            target.topSide() < item.bottomSide();
+    }
+
+    private _targetBottomBetweenItem(target: EntityWithHelper, item: AnyEntityWithHelper): boolean {
+        return target.bottomSide() > item.topSide() &&
+            target.bottomSide() < item.bottomSide();
+    }
+
+    private _targetRightBetweenItem(target: EntityWithHelper, item: AnyEntityWithHelper): boolean {
+        return target.rightSide() >= item.leftSide() &&
+            target.rightSide() < item.rightSide();
+    }
+
+    private _targetLeftBetweenItem(target: EntityWithHelper, item: AnyEntityWithHelper): boolean {
+        return target.leftSide() <= item.rightSide() &&
+            target.leftSide() > item.leftSide();
     }
 }
 

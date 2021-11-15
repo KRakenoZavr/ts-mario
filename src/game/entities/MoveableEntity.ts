@@ -1,7 +1,19 @@
-import { Entity } from "./index";
-import { StaticEntity } from "./staticEnt";
+import { Position, StaticEntity, StaticEntityHelper } from "./StaticEntity";
 
-export default class MoveEntity extends StaticEntity  implements Entity {
+export interface Entity extends Position {
+    speed: number;
+    gravity?: number;
+}
+
+export interface MoveableEntityHelper extends StaticEntityHelper {
+    left(): void;
+    right(): void;
+    down(): void;
+}
+
+export interface EntityWithHelper extends MoveableEntityHelper, Entity {}
+
+export class MoveableEntity extends StaticEntity implements EntityWithHelper {
     public x: number;
     public y: number;
     public width: number;

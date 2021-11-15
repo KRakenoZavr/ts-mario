@@ -1,6 +1,20 @@
-import { Position, StaticEntity as Entity } from "./index";
+export interface Position {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
 
-class StaticEntity implements Entity {
+export interface StaticEntityHelper {
+    rightSide(): number;
+    leftSide(): number;
+    topSide(): number;
+    bottomSide(): number;
+}
+
+export interface StaticEntityWithHelper extends Position, StaticEntityHelper {}
+
+export class StaticEntity implements StaticEntityWithHelper {
     public x: number;
     public y: number;
     public width: number;
@@ -29,6 +43,3 @@ class StaticEntity implements Entity {
         return this.y + this.height;
     }
 }
-
-export { StaticEntity };
-export { StaticEntity as StaticEntityClass };

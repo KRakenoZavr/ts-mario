@@ -5,12 +5,22 @@ import Game from "./game/index";
 // const router = express.Router();
 // const port = 3000;
 
-const game = new Game();
-game.collision.updateSplitted({ min: 0, max: 150, width: 150 });
-console.log(game.mario);
-console.log(game.collision);
+declare global {
+    interface Window { game: any; }
+}
 
-console.log(game.checkCollision());
+document.addEventListener("DOMContentLoaded", (event) => {
+
+    const game = new Game();
+    game.collision.updateSplitted({ min: 0, max: 150, width: 150 });
+
+    game.collision.entities.forEach((el) => game.logEntity(el));
+
+    console.log(game.collision.canMoveRight(game.mario));
+
+    window.game = game;
+
+});
 
 // router.get("/", (req, res) => {
 //     res.send("The sedulous hyena ate the antelope!");

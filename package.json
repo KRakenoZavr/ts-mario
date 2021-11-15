@@ -6,7 +6,12 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "start": "ts-node src/app.ts",
-    "build": "tsc"
+    "babel": "./node_modules/.bin/babel build-tsc --out-dir build-babel --source-maps",
+    "webpack": "webpack && cp public/* dist",
+    "tsc": "./node_modules/.bin/tsc",
+    "clean": "npm run clean-build-steps && rm -rf dist",
+    "clean-build-steps": "rm -rf build-tsc build-babel",
+    "build": "npm run clean && npm run tsc && npm run babel && npm run webpack && npm run clean-build-steps"
   },
   "keywords": [],
   "author": "",
@@ -16,9 +21,13 @@
     "nodemon": "^2.0.14",
     "ts-node": "^10.4.0",
     "tslint": "^5.12.1",
-    "typescript": "^4.4.4"
+    "typescript": "^4.4.4",
+    "webpack-cli": "^4.9.1"
   },
   "dependencies": {
-    "express": "^4.17.1"
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "express": "^4.17.1",
+    "webpack": "^5.64.0"
   }
 }
