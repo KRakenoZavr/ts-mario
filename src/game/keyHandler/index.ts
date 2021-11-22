@@ -5,3 +5,9 @@ export enum keyCode {
     ESC = "Escape",
     F = "KeyF",
 }
+
+export interface KeyHandler {
+    left: boolean;
+    right: boolean;
+    jump: boolean;
+}

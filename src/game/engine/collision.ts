@@ -1,7 +1,7 @@
 import { Entity, EntityWithHelper, StaticEntityWithHelper } from "../entities";
 
 type AnyEntityWithHelper = EntityWithHelper | StaticEntityWithHelper;
-type AnyEntity = Array<(AnyEntityWithHelper)>;
+type AnyEntity = AnyEntityWithHelper[];
 
 export interface Collision {
     entities: AnyEntity;
@@ -17,6 +17,7 @@ export default class CollisionClass implements Collision {
 
     constructor(entities: AnyEntity) {
         this.entities = entities;
+        this._splittedEntities = entities;
     }
 
     // TODO save last splittedEntities
@@ -59,7 +60,6 @@ export default class CollisionClass implements Collision {
                     this._targetBottomBetweenItem(target, item)
                 )
             ) {
-                console.log("right", { target, item });
                 return false;
             }
         }
@@ -78,7 +78,6 @@ export default class CollisionClass implements Collision {
                     this._targetBottomBetweenItem(target, item)
                 )
             ) {
-                console.log("left", { target, item });
                 return false;
             }
         }

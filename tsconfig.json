@@ -6,7 +6,11 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "./build-tsc",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "lib": [
+      "dom",
+      "es2015"
+    ]
   },
   "lib": ["es2015"]
 }

@@ -1,6 +1,6 @@
 import CollisionClass from "./engine/collision";
-import { EntityWithHelper, Mario, StaticEntity, StaticEntityWithHelper } from "./entities";
-import { keyCode } from "./keyHandler";
+import {EntityWithHelper, Mario, MoveableEntity, StaticEntity, StaticEntityWithHelper} from "./entities";
+import KeyHandlerClass from "./keyHandler/KeyHandler";
 
 type AnyEntityWithHelper = EntityWithHelper | StaticEntityWithHelper;
 
@@ -37,42 +37,51 @@ const allEntities: StaticEntity[] = [
     }),
 ];
 
-export default class Game {
+export default class Game extends KeyHandlerClass {
     public collision: CollisionClass;
     public mario: Mario;
     public canvas: HTMLCanvasElement;
     public ctx: CanvasRenderingContext2D;
-    protected lives: number;
 
     constructor() {
-        this.lives = 3;
+        super()
 
         this.mario = new Mario({ x: 0, y: 10, width: 10, height: 10, speed: 2 });
 
         this.collision = new CollisionClass([...allEntities, this.mario]);
 
+        this.initCanvas()
+
+        this.init()
+    }
+
+    private initCanvas() {
         this.canvas = document.createElement("canvas");
         this.ctx = this.canvas.getContext("2d");
         document.body.appendChild(this.canvas);
-
-        this.init();
     }
 
-    public checkCollision(): boolean {
-        // return this.collision.isOnSurface(this.mario);
-        return this.collision.canMoveRight(this.mario);
-    }
+    private init() {
+        this.drawElements();
 
-    public death() {
-        this.lives--;
+        let start = null;
+
+        const step = (timestamp) => {
+            if (!start) start = timestamp;
+            const progress = timestamp - start;
+            this.drawElements();
+            window.requestAnimationFrame(step);
+        }
+
+        window.requestAnimationFrame(step);
     }
 
     public logEntity(entity: AnyEntityWithHelper) {
         console.log(entity instanceof Mario ? "mario" : "entity", {
-            bottom: entity.bottomSide,
-            left: entity.leftSide,
-            right: entity.rightSide,
-            top: entity.topSide,
+            bottom: entity.bottomSide(),
+            left: entity.leftSide(),
+            right: entity.rightSide(),
+            top: entity.topSide(),
         });
     }
 
@@ -80,45 +89,24 @@ export default class Game {
         this.ctx.clearRect(0, 0, 100, 100);
 
         for (const item of this.collision.entities) {
+
+            if (item instanceof MoveableEntity) {
+                if (!this.collision.isOnSurface(item)) {
+                    item.down()
+                }
+            }
+
             this.ctx.beginPath();
             this.ctx.rect(item.x, item.y, item.width, item.height);
+
             if (item instanceof Mario) {
                 this.ctx.fillStyle = "#005eff";
             } else {
                 this.ctx.fillStyle = "#FF0000";
             }
+
             this.ctx.fill();
             this.ctx.closePath();
         }
-    }
-
-    private init() {
-        this.keyHandler();
-        this.drawElements();
-    }
-
-    private keyHandler() {
-        window.addEventListener("keydown", (evt) => {
-            switch (evt.code) {
-                case  keyCode.LEFT:
-                    evt.preventDefault();
-                    this.mario.left();
-                    break;
-                case keyCode.RIGHT:
-                    evt.preventDefault();
-                    this.mario.right();
-                    break;
-                case keyCode.SPACE:
-                    evt.preventDefault();
-                    this.mario.jump();
-                    break;
-                default:
-                    break;
-            }
-
-            this.drawElements();
-            this.collision.canMoveRight(this.mario);
-            this.collision.canMoveLeft(this.mario);
-        });
     }
 }

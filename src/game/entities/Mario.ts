@@ -27,14 +27,24 @@ export class Mario extends MoveableEntity implements Entity, MarioHelper {
     public jump() {
         if (!this._jumping) {
             this._jumping = true;
+            // for (let i = 0; i < this._jumpTicks; i+=1) {
+                // this.y -= this.speed;
+            // }
             let tick: number = 0;
             const interval = setInterval(() => {
                 tick++;
                 this.y -= this.speed;
                 if (tick === this._jumpTicks) {
                     clearInterval(interval);
+                    this._jumping = false;
                 }
-            }, 500);
+            }, 60);
+        }
+    }
+
+    public down() {
+        if (!this._jumping) {
+            this.y += this.gravity;
         }
     }
 }
