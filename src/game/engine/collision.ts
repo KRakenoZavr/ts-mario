@@ -13,27 +13,28 @@ export interface Collision {
 
 export default class CollisionClass implements Collision {
     public entities: AnyEntity
-    private _splittedEntities: AnyEntity
+    public splittedEntities: AnyEntity
 
     constructor(entities: AnyEntity) {
         this.entities = entities
-        this._splittedEntities = entities
+        // TODO only 10 items left and right
+        this.splittedEntities = entities
     }
 
     // TODO save last splittedEntities
-    public updateSplitted({ min, max }: Screen) {
+    public updateSplitted(min: number, max: number) {
         const splitted: AnyEntity = []
         for (const item of this.entities) {
             if (item.leftSide() >= min && item.rightSide() <= max) {
                 splitted.push(item)
             }
         }
-        this._splittedEntities = splitted
+        this.splittedEntities = splitted
     }
 
     // true if on surface
     public isOnSurface(target: EntityWithHelper): boolean {
-        for (const item of this._splittedEntities) {
+        for (const item of this.splittedEntities) {
             if (target === item) {
                 continue
             }
@@ -49,7 +50,7 @@ export default class CollisionClass implements Collision {
     }
 
     public canMoveRight(target: EntityWithHelper): boolean {
-        for (const item of this._splittedEntities) {
+        for (const item of this.splittedEntities) {
             if (target === item) {
                 continue
             }
@@ -65,7 +66,7 @@ export default class CollisionClass implements Collision {
     }
 
     public canMoveLeft(target: EntityWithHelper): boolean {
-        for (const item of this._splittedEntities) {
+        for (const item of this.splittedEntities) {
             if (target === item) {
                 continue
             }
