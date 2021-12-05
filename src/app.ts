@@ -1,27 +1,27 @@
 // import express from "express";
-import Game from "./game/index";
+import Game from './game/index'
 
 // const app = express();
 // const router = express.Router();
 // const port = 3000;
 
 declare global {
-    interface Window { game: any; }
+    interface Window {
+        game: any
+    }
 }
 
-document.addEventListener("DOMContentLoaded", (event) => {
+document.addEventListener('DOMContentLoaded', (event) => {
+    const game = new Game()
 
-    const game = new Game();
+    game.collision.updateSplitted({ min: 0, max: 150, width: 150 })
 
-    game.collision.updateSplitted({ min: 0, max: 150, width: 150 });
+    game.collision.entities.forEach((el) => game.logEntity(el))
 
-    game.collision.entities.forEach((el) => game.logEntity(el));
+    console.log(game.collision.canMoveRight(game.mario))
 
-    console.log(game.collision.canMoveRight(game.mario));
-
-    window.game = game;
-
-});
+    window.game = game
+})
 
 // router.get("/", (req, res) => {
 //     res.send("The sedulous hyena ate the antelope!");

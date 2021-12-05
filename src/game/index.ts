@@ -1,8 +1,14 @@
-import CollisionClass from "./engine/collision";
-import {EntityWithHelper, Mario, MoveableEntity, StaticEntity, StaticEntityWithHelper} from "./entities";
-import KeyHandlerClass from "./keyHandler/KeyHandler";
+import CollisionClass from './engine/collision'
+import {
+    EntityWithHelper,
+    Mario,
+    MoveableEntity,
+    StaticEntity,
+    StaticEntityWithHelper,
+} from './entities'
+import KeyHandlerClass from './keyHandler/KeyHandler'
 
-type AnyEntityWithHelper = EntityWithHelper | StaticEntityWithHelper;
+type AnyEntityWithHelper = EntityWithHelper | StaticEntityWithHelper
 
 const allEntities: StaticEntity[] = [
     new StaticEntity({
@@ -35,78 +41,105 @@ const allEntities: StaticEntity[] = [
         x: 30,
         y: 20,
     }),
-];
+]
 
 export default class Game extends KeyHandlerClass {
-    public collision: CollisionClass;
-    public mario: Mario;
-    public canvas: HTMLCanvasElement;
-    public ctx: CanvasRenderingContext2D;
+    public collision: CollisionClass
+    public mario: Mario
+    public canvas: HTMLCanvasElement
+    public ctx: CanvasRenderingContext2D
 
     constructor() {
         super()
 
-        this.mario = new Mario({ x: 0, y: 10, width: 10, height: 10, speed: 2 });
+        this.mario = new Mario({ x: 0, y: 10, width: 10, height: 10, speed: 2 })
 
-        this.collision = new CollisionClass([...allEntities, this.mario]);
-
-        this.initCanvas()
+        this.collision = new CollisionClass([...allEntities, this.mario])
 
         this.init()
     }
 
-    private initCanvas() {
-        this.canvas = document.createElement("canvas");
-        this.ctx = this.canvas.getContext("2d");
-        document.body.appendChild(this.canvas);
+    private _initCanvas() {
+        this.canvas = document.createElement('canvas')
+        this.ctx = this.canvas.getContext('2d')
+        document.body.appendChild(this.canvas)
     }
 
     private init() {
-        this.drawElements();
+        this._initCanvas()
 
-        let start = null;
+        this._handleGameElements()
 
-        const step = (timestamp) => {
-            if (!start) start = timestamp;
-            const progress = timestamp - start;
-            this.drawElements();
-            window.requestAnimationFrame(step);
+        let start = null
+
+        const step = (timestamp: number) => {
+            if (!start) start = timestamp
+            const progress = timestamp - start
+            this._handleGameElements()
+            window.requestAnimationFrame(step)
         }
 
-        window.requestAnimationFrame(step);
+        window.requestAnimationFrame(step)
     }
 
     public logEntity(entity: AnyEntityWithHelper) {
-        console.log(entity instanceof Mario ? "mario" : "entity", {
+        console.log(entity instanceof Mario ? 'mario' : 'entity', {
             bottom: entity.bottomSide(),
             left: entity.leftSide(),
             right: entity.rightSide(),
             top: entity.topSide(),
-        });
+        })
     }
 
-    public drawElements() {
-        this.ctx.clearRect(0, 0, 100, 100);
+    public _handleGameElements() {
+        // clear game screen
+        this.ctx.clearRect(0, 0, 100, 100)
+
+        this._handleMarioMovement()
 
         for (const item of this.collision.entities) {
+            this._handleGravity(item)
 
-            if (item instanceof MoveableEntity) {
-                if (!this.collision.isOnSurface(item)) {
-                    item.down()
-                }
-            }
-
-            this.ctx.beginPath();
-            this.ctx.rect(item.x, item.y, item.width, item.height);
-
-            if (item instanceof Mario) {
-                this.ctx.fillStyle = "#005eff";
-            } else {
-                this.ctx.fillStyle = "#FF0000";
-            }
-
-            this.ctx.fill();
-            this.ctx.closePath();
+            // refill game screen with new objects
+            this._drawSingleItem(item)
         }
+    }
+
+    private _handleMarioMovement() {
+        // mario left
+        if (this.left && this.collision.canMoveLeft(this.mario)) {
+            this.mario.left()
+        }
+        // mario right
+        if (this.right && this.collision.canMoveRight(this.mario)) {
+            this.mario.right()
+        }
+        // TODO
+        // mario jump
+    }
+
+    private _handleGravity(item: AnyEntityWithHelper) {
+        // if item not static entity
+        if (item instanceof MoveableEntity) {
+            // if nothing is under item
+            if (!this.collision.isOnSurface(item)) {
+                item.down()
+            }
+        }
+    }
+
+    private _drawSingleItem(item: AnyEntityWithHelper) {
+        this.ctx.beginPath()
+        this.ctx.rect(item.x, item.y, item.width, item.height)
+
+        // TODO should be item.color
+        if (item instanceof Mario) {
+            this.ctx.fillStyle = '#005eff'
+        } else {
+            this.ctx.fillStyle = '#FF0000'
+        }
+
+        this.ctx.fill()
+        this.ctx.closePath()
     }
 }

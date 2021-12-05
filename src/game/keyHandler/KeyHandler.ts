@@ -1,54 +1,54 @@
-import {KeyHandler, keyCode} from "./index"
+import { KeyHandler, keyCode } from './index'
 
 export default class KeyHandlerClass implements KeyHandler {
-    public left: boolean;
-    public right: boolean;
-    public jump: boolean;
+    public left: boolean
+    public right: boolean
+    public jump: boolean
 
     constructor() {
-        this.left = false;
-        this.right = false;
-        this.jump = false;
+        this.left = false
+        this.right = false
+        this.jump = false
 
-        window.addEventListener("keydown", this.keyDown)
-        window.addEventListener("keyup", this.keyUp)
+        window.addEventListener('keydown', this._keyDown.bind(this))
+        window.addEventListener('keyup', this._keyUp.bind(this))
     }
 
-    private keyDown(evt) {
+    private _keyDown(evt: KeyboardEvent) {
         switch (evt.code) {
             case keyCode.LEFT:
-                evt.preventDefault();
-                this.left = true;
-                break;
+                evt.preventDefault()
+                this.left = true
+                break
             case keyCode.RIGHT:
-                evt.preventDefault();
-                this.right = true;
-                break;
+                evt.preventDefault()
+                this.right = true
+                break
             case keyCode.SPACE:
-                evt.preventDefault();
-                this.jump = true;
-                break;
+                evt.preventDefault()
+                this.jump = true
+                break
             default:
-                break;
+                break
         }
     }
 
-    private keyUp(evt) {
+    private _keyUp(evt: KeyboardEvent) {
         switch (evt.code) {
             case keyCode.LEFT:
-                evt.preventDefault();
-                this.left = false;
-                break;
+                evt.preventDefault()
+                this.left = false
+                break
             case keyCode.RIGHT:
-                evt.preventDefault();
-                this.right = false;
-                break;
+                evt.preventDefault()
+                this.right = false
+                break
             case keyCode.SPACE:
-                evt.preventDefault();
-                this.jump = false;
-                break;
+                evt.preventDefault()
+                this.jump = false
+                break
             default:
-                break;
+                break
         }
     }
 }

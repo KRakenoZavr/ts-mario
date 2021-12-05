@@ -33,6 +33,7 @@ export class MoveableEntity extends StaticEntity implements EntityWithHelper {
     }
 
     public right() {
+        console.log(this)
         this.x += this.speed;
     }
 
