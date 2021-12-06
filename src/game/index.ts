@@ -55,22 +55,17 @@ export default class Game extends KeyHandlerClass {
         this.mario = new Mario({ x: 0, y: 10, width: 10, height: 10, speed: 2 })
 
         this.collision = new CollisionClass([...allEntities, this.mario])
+        this.canvas = document.createElement('canvas')
+        this.ctx = this.canvas.getContext('2d')
+        document.body.appendChild(this.canvas)
 
         this.init()
     }
 
-    private _initCanvas() {
-        this.canvas = document.createElement('canvas')
-        this.ctx = this.canvas.getContext('2d')
-        document.body.appendChild(this.canvas)
-    }
-
     private init() {
-        this._initCanvas()
-
         this._handleGameElements()
 
-        let start = null
+        let start: number | null = null
 
         const step = (timestamp: number) => {
             if (!start) start = timestamp
