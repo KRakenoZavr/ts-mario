@@ -7,6 +7,7 @@ export interface Collision {
     entities: AnyEntity
 
     isOnSurface: (target: Entity) => boolean
+    somethingOnTop: (target: Entity) => boolean
     canMoveRight: (target: Entity) => boolean
     canMoveLeft: (target: Entity) => boolean
 }
@@ -19,6 +20,8 @@ export default class CollisionClass implements Collision {
         this.entities = entities
         // TODO only 10 items left and right
         this.splittedEntities = entities
+
+        console.log(entities)
     }
 
     // TODO save last splittedEntities
@@ -40,6 +43,22 @@ export default class CollisionClass implements Collision {
             }
             if (
                 target.bottomSide() === item.topSide() &&
+                target.leftSide() < item.rightSide() &&
+                target.rightSide() > item.leftSide()
+            ) {
+                return true
+            }
+        }
+        return false
+    }
+
+    public somethingOnTop(target: EntityWithHelper): boolean {
+        for (const item of this.splittedEntities) {
+            if (target === item) {
+                continue
+            }
+            if (
+                target.topSide() === item.bottomSide() &&
                 target.leftSide() < item.rightSide() &&
                 target.rightSide() > item.leftSide()
             ) {
@@ -86,7 +105,7 @@ export default class CollisionClass implements Collision {
         item: AnyEntityWithHelper
     ): boolean {
         return (
-            target.topSide() > item.topSide() &&
+            target.topSide() >= item.topSide() &&
             target.topSide() < item.bottomSide()
         )
     }

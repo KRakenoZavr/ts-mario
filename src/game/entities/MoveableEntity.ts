@@ -1,6 +1,6 @@
-import { Position, StaticEntity, StaticEntityHelper } from "./StaticEntity";
+import {Position, PositionWithColor, StaticEntity, StaticEntityHelper} from "./StaticEntity";
 
-export interface Entity extends Position {
+export interface Entity extends PositionWithColor {
     speed: number;
     gravity?: number;
 }
@@ -21,8 +21,8 @@ export class MoveableEntity extends StaticEntity implements EntityWithHelper {
     public speed: number;
     public gravity: number;
 
-    constructor({ x, y, width, height, speed, gravity = speed }: Entity) {
-        super({ x, y, width, height });
+    constructor({ x, y, width, height, color, speed, gravity = speed }: Entity) {
+        super({ x, y, width, height, color });
 
         this.speed = speed;
         this.gravity = gravity;

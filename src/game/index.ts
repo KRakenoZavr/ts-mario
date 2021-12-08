@@ -7,54 +7,31 @@ import {
     StaticEntityWithHelper,
 } from './entities'
 import KeyHandlerClass from './keyHandler/KeyHandler'
+import {createLevel} from "./map/CreateLevel";
+import {DrawLevel} from "./map/CreateLevel";
 
 type AnyEntityWithHelper = EntityWithHelper | StaticEntityWithHelper
-
-const allEntities: StaticEntity[] = [
-    new StaticEntity({
-        height: 10,
-        width: 10,
-        x: 0,
-        y: 20,
-    }),
-    new StaticEntity({
-        height: 10,
-        width: 10,
-        x: 10,
-        y: 20,
-    }),
-    new StaticEntity({
-        height: 10,
-        width: 10,
-        x: 20,
-        y: 16,
-    }),
-    // new StaticEntity({
-    //     height: 10,
-    //     width: 10,
-    //     x: 40,
-    //     y: 5,
-    // }),
-    new StaticEntity({
-        height: 10,
-        width: 10,
-        x: 30,
-        y: 20,
-    }),
-]
 
 export default class Game extends KeyHandlerClass {
     public collision: CollisionClass
     public mario: Mario
     public canvas: HTMLCanvasElement
     public ctx: CanvasRenderingContext2D
+    public level: DrawLevel
+    public entites: AnyEntityWithHelper
 
     constructor() {
         super()
 
-        this.mario = new Mario({x: 0, y: 10, width: 10, height: 10, speed: 2})
+        // this.mario = new Mario({x: 0, y: 10, width: 10, height: 10, speed: 2})
 
-        this.collision = new CollisionClass([...allEntities, this.mario])
+        // this.collision = new CollisionClass([...createLevel(), this.mario])
+
+        const {entities, mario} = createLevel()
+
+        this.mario = mario
+
+        this.collision = new CollisionClass(entities)
 
         this.init()
     }
@@ -62,6 +39,9 @@ export default class Game extends KeyHandlerClass {
     private _initCanvas() {
         this.canvas = document.createElement('canvas')
         this.ctx = this.canvas.getContext('2d')
+
+        this.level = new DrawLevel(this.ctx)
+
         document.body.appendChild(this.canvas)
     }
 
@@ -104,7 +84,7 @@ export default class Game extends KeyHandlerClass {
 
     public _handleGameElements() {
         // clear game screen
-        this.ctx.clearRect(0, 0, 100, 100)
+        this.ctx.clearRect(0, 0, 1000, 1000)
 
         this._handleMarioMovement()
 
@@ -112,7 +92,7 @@ export default class Game extends KeyHandlerClass {
             this._handleGravity(item)
 
             // refill game screen with new objects
-            this._drawSingleItem(item)
+            this.level.drawSingleItem(item)
         }
     }
 
@@ -126,15 +106,16 @@ export default class Game extends KeyHandlerClass {
             this.mario.right()
         }
         // mario jump
+        const canJump = this.jump && !this.collision.somethingOnTop(this.mario)
         if (
-            this.jump &&
+            canJump &&
             (this.mario.jumping || this.collision.isOnSurface(this.mario))
         ) {
             this.mario.jump(this.jump)
         }
         // TODO
         // do this func only once
-        if (!this.jump) {
+        if (!canJump) {
             this.mario.changeJumping()
         }
     }
@@ -147,20 +128,5 @@ export default class Game extends KeyHandlerClass {
                 item.down()
             }
         }
-    }
-
-    private _drawSingleItem(item: AnyEntityWithHelper) {
-        this.ctx.beginPath()
-        this.ctx.rect(item.x, item.y, item.width, item.height)
-
-        // TODO should be item.color
-        if (item instanceof Mario) {
-            this.ctx.fillStyle = '#005eff'
-        } else {
-            this.ctx.fillStyle = '#FF0000'
-        }
-
-        this.ctx.fill()
-        this.ctx.closePath()
     }
 }

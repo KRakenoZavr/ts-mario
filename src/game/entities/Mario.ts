@@ -20,8 +20,8 @@ export class Mario extends MoveableEntity implements Entity, MarioHelper {
     private _maxJumpHeight: number
     private readonly _jumpTicks: number
 
-    constructor({x, y, width, height, speed, gravity}: Entity) {
-        super({x, y, width, height, speed, gravity})
+    constructor({x, y, width, height, color, speed, gravity}: Entity) {
+        super({x, y, width, height, color, speed, gravity})
 
         this.jumping = false
         this._jumpTicks = 3
@@ -33,7 +33,7 @@ export class Mario extends MoveableEntity implements Entity, MarioHelper {
         if (jumping) {
             this.jumping = true
             if (this._maxJumpHeight === -1) {
-                this._maxJumpHeight = this.y - this.gravity * 10
+                this._maxJumpHeight = this.y - this.gravity * 25
             }
             if (this.y === this._maxJumpHeight) {
                 this._setToDefault()

@@ -5,6 +5,10 @@ export interface Position {
     height: number
 }
 
+export interface PositionWithColor extends Position {
+    color: string
+}
+
 export interface StaticEntityHelper {
     rightSide(): number
     leftSide(): number
@@ -12,19 +16,21 @@ export interface StaticEntityHelper {
     bottomSide(): number
 }
 
-export interface StaticEntityWithHelper extends Position, StaticEntityHelper {}
+export interface StaticEntityWithHelper extends PositionWithColor, StaticEntityHelper {}
 
 export class StaticEntity implements StaticEntityWithHelper {
     public x: number
     public y: number
     public width: number
     public height: number
+    public color: string
 
-    constructor({ x, y, width, height }: Position) {
+    constructor({ x, y, width, height, color }: PositionWithColor) {
         this.x = x
         this.y = y
         this.width = width
         this.height = height
+        this.color = color
     }
 
     public rightSide(): number {
