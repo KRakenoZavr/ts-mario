@@ -71,10 +71,10 @@ export default class Game extends KeyHandlerClass {
         this._handleGameElements()
 
         const fps: number = 60
-        let now
-        let then = Date.now()
-        const interval = 1000 / fps
-        let delta
+        let now: number
+        let then: number = Date.now()
+        const interval: number = 1000 / fps
+        let delta: number
 
         const step = () => {
             window.requestAnimationFrame(step)
@@ -125,11 +125,15 @@ export default class Game extends KeyHandlerClass {
         if (this.right && this.collision.canMoveRight(this.mario)) {
             this.mario.right()
         }
-        // TODO
         // mario jump
-        if (this.jump) {
+        if (
+            this.jump &&
+            (this.mario.jumping || this.collision.isOnSurface(this.mario))
+        ) {
             this.mario.jump(this.jump)
         }
+        // TODO
+        // do this func only once
         if (!this.jump) {
             this.mario.changeJumping()
         }

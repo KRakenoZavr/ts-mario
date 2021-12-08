@@ -40,8 +40,8 @@ export default class CollisionClass implements Collision {
             }
             if (
                 target.bottomSide() === item.topSide() &&
-                target.leftSide() <= item.rightSide() &&
-                target.rightSide() >= item.leftSide()
+                target.leftSide() < item.rightSide() &&
+                target.rightSide() > item.leftSide()
             ) {
                 return true
             }

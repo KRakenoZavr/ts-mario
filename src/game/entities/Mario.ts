@@ -1,7 +1,10 @@
 import {Entity, MoveableEntity, MoveableEntityHelper} from './MoveableEntity'
 
 interface MarioHelper extends MoveableEntityHelper {
+    jumping: boolean
+
     jump: (jumping: boolean) => void
+    changeJumping: () => void
 }
 
 // TODO
@@ -13,44 +16,45 @@ export class Mario extends MoveableEntity implements Entity, MarioHelper {
     public height: number
     public speed: number
     public gravity: number
-    private _jumping: boolean
+    public jumping: boolean
+    private _maxJumpHeight: number
     private readonly _jumpTicks: number
 
     constructor({x, y, width, height, speed, gravity}: Entity) {
         super({x, y, width, height, speed, gravity})
 
-        this._jumping = false
+        this.jumping = false
         this._jumpTicks = 3
+        this._maxJumpHeight = -1
     }
 
     // TODO define interval as method
     public jump(jumping: boolean) {
         if (jumping) {
-            this._jumping = true
-            // for (let i = 0; i < this._jumpTicks; i+=1) {
-            // this.y -= this.speed;
-            // }
-            // let tick: number = 0
-            // const interval = setInterval(() => {
-            //     tick++
-            this.y -= this.speed
-            console.log("jumping", this.y)
-            // if (tick === this._jumpTicks) {
-            //     clearInterval(interval)
-            //     this._jumping = false
-            // }
-            // }, 60)
+            this.jumping = true
+            if (this._maxJumpHeight === -1) {
+                this._maxJumpHeight = this.y - this.gravity * 10
+            }
+            if (this.y === this._maxJumpHeight) {
+                this._setToDefault()
+            } else {
+                this.y -= this.gravity
+            }
         }
     }
 
+    private _setToDefault() {
+        this.jumping = false
+        this._maxJumpHeight = -1
+    }
+
     public changeJumping() {
-        this._jumping = false
+        this._setToDefault()
     }
 
     public down() {
-        if (!this._jumping) {
+        if (!this.jumping) {
             this.y += this.gravity
-            console.log("falling", this.y)
         }
     }
 }
