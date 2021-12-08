@@ -27,7 +27,7 @@ const allEntities: StaticEntity[] = [
         height: 10,
         width: 10,
         x: 20,
-        y: 15,
+        y: 16,
     }),
     // new StaticEntity({
     //     height: 10,
@@ -52,7 +52,7 @@ export default class Game extends KeyHandlerClass {
     constructor() {
         super()
 
-        this.mario = new Mario({ x: 0, y: 10, width: 10, height: 10, speed: 2 })
+        this.mario = new Mario({x: 0, y: 10, width: 10, height: 10, speed: 2})
 
         this.collision = new CollisionClass([...allEntities, this.mario])
 
@@ -70,16 +70,27 @@ export default class Game extends KeyHandlerClass {
 
         this._handleGameElements()
 
-        let start = null
+        const fps: number = 60
+        let now
+        let then = Date.now()
+        const interval = 1000 / fps
+        let delta
 
-        const step = (timestamp: number) => {
-            if (!start) start = timestamp
-            const progress = timestamp - start
-            this._handleGameElements()
+        const step = () => {
             window.requestAnimationFrame(step)
+
+            now = Date.now()
+            delta = now - then
+
+            if (delta > interval) {
+                then = now - (delta % interval)
+
+                this._handleGameElements()
+            }
+
         }
 
-        window.requestAnimationFrame(step)
+        step()
     }
 
     public logEntity(entity: AnyEntityWithHelper) {
@@ -116,6 +127,12 @@ export default class Game extends KeyHandlerClass {
         }
         // TODO
         // mario jump
+        if (this.jump) {
+            this.mario.jump(this.jump)
+        }
+        if (!this.jump) {
+            this.mario.changeJumping()
+        }
     }
 
     private _handleGravity(item: AnyEntityWithHelper) {
