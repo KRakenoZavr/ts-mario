@@ -1,16 +1,20 @@
 {
+  "extends": "@tsconfig/recommended/tsconfig.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "esModuleInterop": true,
-    "target": "es6",
-    "moduleResolution": "node",
-    "sourceMap": true,
-    "outDir": "./build-tsc",
-    "rootDir": "./src",
+    "outDir": "./dist",
     "lib": [
       "dom",
       "es2015"
     ]
   },
-  "lib": ["es2015"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "lib": [
+    "es2015"
+  ]
 }
