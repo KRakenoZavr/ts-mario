@@ -2,7 +2,7 @@ import {Position, PositionWithColor, StaticEntity, StaticEntityHelper} from "./S
 
 export interface Entity extends PositionWithColor {
     speed: number;
-    gravity?: number;
+    gravity: number;
 }
 
 export interface MoveableEntityHelper extends StaticEntityHelper {
@@ -33,7 +33,6 @@ export class MoveableEntity extends StaticEntity implements EntityWithHelper {
     }
 
     public right() {
-        console.log(this)
         this.x += this.speed;
     }
 

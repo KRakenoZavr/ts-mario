@@ -1,10 +1,19 @@
-import { Entity, EntityWithHelper, StaticEntityWithHelper } from '../entities'
+import {Entity, EntityWithHelper, Mario, MoveableEntity, StaticEntityWithHelper} from '../entities'
 
 type AnyEntityWithHelper = EntityWithHelper | StaticEntityWithHelper
 type AnyEntity = AnyEntityWithHelper[]
 
 export interface Collision {
-    entities: AnyEntity
+    // all game elements
+    allEntities: AnyEntity
+    // game elements near mario
+    splittedEntities: AnyEntity
+    // all static elements
+    staticEntites: StaticEntityWithHelper[]
+    // all movable elements
+    movableEntities: EntityWithHelper[]
+    // movable elements near mario
+    splittedMovableEntities: EntityWithHelper[]
 
     isOnSurface: (target: Entity) => boolean
     somethingOnTop: (target: Entity) => boolean
@@ -13,21 +22,48 @@ export interface Collision {
 }
 
 export default class CollisionClass implements Collision {
-    public entities: AnyEntity
+    public readonly allEntities: AnyEntity
     public splittedEntities: AnyEntity
 
-    constructor(entities: AnyEntity) {
-        this.entities = entities
+    public readonly staticEntites: StaticEntityWithHelper[]
+
+    public readonly movableEntities: EntityWithHelper[]
+    public splittedMovableEntities: EntityWithHelper[]
+
+    private readonly _mario: Mario
+    private readonly _config: any
+
+    constructor(entities: AnyEntity, mario: Mario, config) {
+        this._mario = mario
+
+        this._config = config
+
+        this.movableEntities = []
+        this.splittedMovableEntities = []
+
+
+        this._initEntites(entities)
+
+        this.allEntities = entities
         // TODO only 10 items left and right
         this.splittedEntities = entities
+        // TODO update splitted entites and splitted movable
 
-        console.log(entities)
+    }
+
+    private _initEntites(entities: AnyEntity) {
+        for (const item of entities) {
+            if (item instanceof MoveableEntity) {
+                this.movableEntities.push(item)
+            }
+        }
+        console.log("movables::", this.movableEntities)
     }
 
     // TODO save last splittedEntities
     public updateSplitted(min: number, max: number) {
         const splitted: AnyEntity = []
-        for (const item of this.entities) {
+        for (const item of this.allEntities) {
             if (item.leftSide() >= min && item.rightSide() <= max) {
                 splitted.push(item)
             }

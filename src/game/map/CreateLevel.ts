@@ -3,56 +3,18 @@ import {EntityWithHelper, Mario} from "../entities";
 
 type AnyEntityWithHelper = EntityWithHelper | StaticEntityWithHelper
 
-export function createLevel(): { entities: AnyEntityWithHelper[], mario: Mario } {
-    const width = 10
-    const height = 10
-    const entities: AnyEntityWithHelper[] = []
-
-    let mario
-
-    for (let i: number = 0; i < level.length; i++) {
-        for (let j: number = 0; j < level[i].length; j++) {
-            const itemType = level[i][j]
-            if (itemType !== 0) {
-
-                const object = LEVEL_OBJECTS[itemType]
-
-                if (itemType === 10) {
-                    mario = new Mario({
-                        width,
-                        height,
-                        x: j * 10,
-                        y: i * 10,
-                        ...object
-                    })
-                    entities.push(mario)
-                } else {
-                    entities.push(
-                        new object.type({
-                            width,
-                            height,
-                            x: j * 10,
-                            y: i * 10,
-                            ...object
-                        })
-                    )
-                }
-            }
-        }
-    }
-
-    return {entities, mario}
-}
-
 export class DrawLevel {
     public ctx: CanvasRenderingContext2D
+    public readonly _config: any
 
-    constructor(ctx) {
+    constructor(ctx, config) {
         this.ctx = ctx
+        this._config = config
     }
 
     public drawSingleItem(item: AnyEntityWithHelper) {
         this.ctx.beginPath()
+
         this.ctx.rect(item.x, item.y, item.width, item.height)
 
         this.ctx.fillStyle = item.color
@@ -60,6 +22,55 @@ export class DrawLevel {
         this.ctx.fill()
         this.ctx.closePath()
     }
+
+    public createLevelObjects(): { entities: AnyEntityWithHelper[], mario: Mario } {
+        const {width, height} = this._config
+        const entities: AnyEntityWithHelper[] = []
+
+        let mario
+
+        for (let i: number = 0; i < level.length; i++) {
+            for (let j: number = 0; j < level[i].length; j++) {
+                const itemType = level[i][j]
+                if (itemType !== 0) {
+
+                    const object = LEVEL_OBJECTS[itemType]
+
+                    if (itemType === 10) {
+                        mario = new Mario({
+                            width,
+                            height,
+                            x: j * width,
+                            y: i * height,
+                            ...object
+                        })
+                        entities.push(mario)
+                    } else {
+                        entities.push(
+                            new object.type({
+                                width,
+                                height,
+                                x: j * width,
+                                y: i * height,
+                                ...object
+                            })
+                        )
+                    }
+                }
+            }
+        }
+
+        this._initFirstTime(entities)
+
+        return {entities, mario}
+    }
+
+    private _initFirstTime(entities: AnyEntityWithHelper[]) {
+        for (const item of entities) {
+            this.drawSingleItem(item)
+        }
+    }
+
 
 }
 
