@@ -19,6 +19,8 @@ export default class Game extends KeyHandlerClass {
     public ctx: CanvasRenderingContext2D
     public level: DrawLevel
 
+    public gameScreen: any
+
     public config: any
 
     constructor() {
@@ -33,6 +35,10 @@ export default class Game extends KeyHandlerClass {
 
     private _initClasses() {
         this.level = new DrawLevel(this.ctx, this.config)
+
+        this.gameScreen = {
+            x: 0
+        }
 
         const {entities, mario} = this.level.createLevelObjects()
 
@@ -90,16 +96,11 @@ export default class Game extends KeyHandlerClass {
 
         this._handleMarioMovement()
 
-        for (const item of this.collision.movableEntities) {
-            // this.ctx.clearRect(item.x, item.y, item.width, item.height)
+        this._handleGravity()
 
-            this._handleGravity(item)
-
-            // refill game screen with new objects
-            // this.level.drawSingleItem(item)
-        }
     }
 
+    // TODO should handle movable entities
     private _handleMarioMovement() {
         // mario jump
         const canJump = this.jump && !this.collision.somethingOnTop(this.mario)
@@ -115,18 +116,31 @@ export default class Game extends KeyHandlerClass {
 
 
             // mario left
-            if (this.left && this.collision.canMoveLeft(this.mario)) {
+            if (canMoveLeft) {
+
+                // update entities that collide
+                this.collision.updateSplitted()
+
                 this.mario.left()
             }
             // mario right
-            if (this.right && this.collision.canMoveRight(this.mario)) {
+            if (canMoveRight) {
+
+                // update entities that collide
+                this.collision.updateSplitted()
+
+                // 400 to variable
+                if (0 - this.gameScreen.x + 400 < this.mario.x) {
+                    // move game screen
+                    this.gameScreen.x -= this.config.speed
+
+                    this.canvas.style.transform = `translateX(${this.gameScreen.x}px)`
+                }
+
                 this.mario.right()
             }
-
-            if (
-                canJump &&
-                (this.mario.jumping || this.collision.isOnSurface(this.mario))
-            ) {
+            // mario jump
+            if (canMoveUp) {
                 this.mario.jump(this.jump)
             }
 
@@ -144,14 +158,21 @@ export default class Game extends KeyHandlerClass {
         this.ctx.clearRect(item.x, item.y, item.width, item.height)
     }
 
-    private _handleGravity(item: MoveableEntity) {
-        // if nothing is under item
-        if (!this.collision.isOnSurface(item)) {
-            this._clearRect(item)
+    private _handleGravity() {
+        for (const item of this.collision.movableEntities) {
+            // this.ctx.clearRect(item.x, item.y, item.width, item.height)
 
-            item.down()
+            // if nothing is under item
+            if (!this.collision.isOnSurface(item)) {
+                this._clearRect(item)
 
-            this.level.drawSingleItem(item)
+                item.down()
+
+                this.level.drawSingleItem(item)
+            }
+
+            // refill game screen with new objects
+            // this.level.drawSingleItem(item)
         }
     }
 }

@@ -1,4 +1,4 @@
-import {Entity, EntityWithHelper, Mario, MoveableEntity, StaticEntityWithHelper} from '../entities'
+import {Entity, EntityWithHelper, Mario, MoveableEntity, StaticEntity, StaticEntityWithHelper} from '../entities'
 
 type AnyEntityWithHelper = EntityWithHelper | StaticEntityWithHelper
 type AnyEntity = AnyEntityWithHelper[]
@@ -39,14 +39,14 @@ export default class CollisionClass implements Collision {
         this._config = config
 
         this.movableEntities = []
+        this.staticEntites = []
         this.splittedMovableEntities = []
+        this.splittedEntities = []
 
 
         this._initEntites(entities)
 
         this.allEntities = entities
-        // TODO only 10 items left and right
-        this.splittedEntities = entities
         // TODO update splitted entites and splitted movable
 
     }
@@ -55,20 +55,37 @@ export default class CollisionClass implements Collision {
         for (const item of entities) {
             if (item instanceof MoveableEntity) {
                 this.movableEntities.push(item)
+            } else if (item instanceof StaticEntity) {
+                this.staticEntites.push(item)
             }
+
+            this._isItemNearMario(item)
         }
         console.log("movables::", this.movableEntities)
+        console.log("static::", this.staticEntites)
+    }
+
+    private _maxLeftAndRight() {
+        const min = this._mario.leftSide() - this._config.maxLeft * this._config.width
+        const max = this._mario.rightSide() + this._config.maxLeft * this._config.width
+        return {min, max}
+    }
+
+    private _isItemNearMario(item: AnyEntityWithHelper) {
+        const {min, max} = this._maxLeftAndRight()
+
+        if (item.x > min && item.x < max) {
+            this.splittedEntities.push(item)
+        }
     }
 
     // TODO save last splittedEntities
-    public updateSplitted(min: number, max: number) {
-        const splitted: AnyEntity = []
+    public updateSplitted() {
+        this.splittedEntities.splice(0, this.splittedEntities.length)
+
         for (const item of this.allEntities) {
-            if (item.leftSide() >= min && item.rightSide() <= max) {
-                splitted.push(item)
-            }
+            this._isItemNearMario(item)
         }
-        this.splittedEntities = splitted
     }
 
     // true if on surface

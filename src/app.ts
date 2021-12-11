@@ -15,7 +15,7 @@ declare global {
 document.addEventListener('DOMContentLoaded', (event) => {
     const game = new Game()
 
-    game.collision.updateSplitted(0, 2500000)
+    game.collision.updateSplitted()
 
     // game.collision.entities.forEach((el) => game.logEntity(el))
 

@@ -4,5 +4,7 @@ export const config = {
     gravity: 2,
     blockSize: 10,
     width: 10,
-    height: 10
+    height: 10,
+    maxLeft: 10,
+    maxRight: 10
 }
